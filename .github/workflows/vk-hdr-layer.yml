@@ -35,20 +35,20 @@ jobs:
         id: compare-commits
         run: |
           if [ "${{ steps.get-latest-commit.outputs.latest_commit }}" != "${{ steps.get-current-commit.outputs.current_commit }}" ]; then
-            echo "new-commit='true'" >> $GITHUB_OUTPUT
+            echo "new-commit=true" >> $GITHUB_OUTPUT
           else
-            echo "new-commit='false'" >> $GITHUB_OUTPUT
+            echo "new-commit=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Update Spec File
-        if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
+        if: ${{ contains(steps.compare-commits.outputs.new-commit, 'true') }}
         run: |
           sed -i "s/^%global date .*/%global date ${{ steps.get-current-date.outputs.current_date }}/" vk-hdr-layer.spec
           sed -i "s/^%global commit .*/%global commit ${{ steps.get-latest-commit.outputs.short_commit }}/" vk-hdr-layer.spec
           sed -i "s/^%global longcommit .*/%global longcommit ${{ steps.get-latest-commit.outputs.latest_commit }}/" vk-hdr-layer.spec
           
       - name: Commit and Push Changes
-        if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
+        if: ${{ contains(steps.compare-commits.outputs.new-commit, 'true') }}
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
