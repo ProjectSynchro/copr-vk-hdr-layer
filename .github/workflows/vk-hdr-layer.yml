@@ -17,6 +17,7 @@ jobs:
         run: |
           latest_commit=$(curl -s https://api.github.com/repos/Zamundaaa/VK_hdr_layer/commits | jq -r '.[0].sha')
           echo "latest_commit=$latest_commit" >> $GITHUB_OUTPUT
+          echo "short_commit=$(echo $latest_commit | cut -c1-7)" >> $GITHUB_OUTPUT
 
       - name: Get current date
         id: get-current-date
@@ -43,7 +44,7 @@ jobs:
         if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
         run: |
           sed -i "s/^%global date .*/%global date ${{ steps.get-current-date.outputs.current_date }}/" vk-hdr-layer.spec
-          sed -i "s/^%global commit .*/%global commit ${{ steps.get-latest-commit.outputs.latest_commit:0:7 }}/" vk-hdr-layer.spec
+          sed -i "s/^%global commit .*/%global commit ${{ steps.get-latest-commit.outputs.short_commit }}/" vk-hdr-layer.spec
           sed -i "s/^%global longcommit .*/%global longcommit ${{ steps.get-latest-commit.outputs.latest_commit }}/" vk-hdr-layer.spec
           
       - name: Commit and Push Changes
