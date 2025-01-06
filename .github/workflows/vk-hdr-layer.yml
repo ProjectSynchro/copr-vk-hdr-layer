@@ -10,12 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Get short commit SHA
-        id: get-commit-sha
+      - name: Get latest commit SHA from GitHub API
+        id: get-latest-commit
         run: |
-          echo "short_commit=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          latest_commit=$(curl -s https://api.github.com/repos/Zamundaaa/VK_hdr_layer/commits | jq -r '.[0].sha')
+          echo "latest_commit=$latest_commit" >> $GITHUB_OUTPUT
 
       - name: Get current date
         id: get-current-date
@@ -25,18 +26,14 @@ jobs:
       - name: Get current commit in spec
         id: get-current-commit
         run: |
-          current_commit=$(grep -oP '(?<=^%global commit ).*' vk-hdr-layer.spec || echo "")
-          current_commit=$(echo "$current_commit" | tr -d '[:space:]') echo "current_commit=$current_commit" >> $GITHUB_OUTPUT
-
-      - name: Get full commit SHA
-        id: get-long-commit
-        run: |
-          echo "long_commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          current_commit=$(grep -oP '(?<=^%global longcommit ).*' vk-hdr-layer.spec || echo "")
+          current_commit=$(echo "$current_commit" | tr -d '[:space:]')
+          echo "current_commit=$current_commit" >> $GITHUB_OUTPUT
 
       - name: Compare commits
         id: compare-commits
         run: |
-          if [ "${{ steps.get-commit-sha.outputs.short_commit }}" != "${{ steps.get-current-commit.outputs.current_commit }}" ]; then
+          if [ "${{ steps.get-latest-commit.outputs.latest_commit }}" != "${{ steps.get-current-commit.outputs.current_commit }}" ]; then
             echo "new-commit='true'" >> $GITHUB_OUTPUT
           else
             echo "new-commit='false'" >> $GITHUB_OUTPUT
@@ -46,8 +43,8 @@ jobs:
         if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
         run: |
           sed -i "s/^%global date .*/%global date ${{ steps.get-current-date.outputs.current_date }}/" vk-hdr-layer.spec
-          sed -i "s/^%global commit .*/%global commit ${{ steps.get-commit-sha.outputs.short_commit }}/" vk-hdr-layer.spec
-          sed -i "s/^%global longcommit .*/%global longcommit ${{ steps.get-long-commit.outputs.long_commit }}/" vk-hdr-layer.spec
+          sed -i "s/^%global commit .*/%global commit ${{ steps.get-latest-commit.outputs.latest_commit:0:7 }}/" vk-hdr-layer.spec
+          sed -i "s/^%global longcommit .*/%global longcommit ${{ steps.get-latest-commit.outputs.latest_commit }}/" vk-hdr-layer.spec
           
       - name: Commit and Push Changes
         if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
