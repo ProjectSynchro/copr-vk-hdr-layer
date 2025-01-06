@@ -17,3 +17,24 @@ To revert this, remove the package with `sudo dnf install vk-hdr-layer` and remo
 Feel free to open issues when there are build issues I haven't fixed for a few days: https://github.com/ProjectSynchro/copr-vk-hdr-layer/issues
 
 If you'd like me to attempt to package this for other RPM based distros like SUSE, open an issue and I'll see what I can do :)
+
+## Testing
+
+To test build this package locally using `fedpkg`, follow these steps:
+
+1. Install `fedpkg`:
+   ```sh
+   sudo dnf install fedpkg
+   ```
+
+3. Prepare the sources:
+   ```sh
+   fedpkg prep
+   ```
+
+4. Build the package:
+   ```sh
+   fedpkg local
+   ```
+
+This will create the RPM packages in the `x86_64` (or whatever arch you are building this package for) directory under the current working directory.
