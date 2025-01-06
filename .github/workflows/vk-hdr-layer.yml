@@ -6,7 +6,7 @@ on:
     - cron: "0 * * * *"
 
 jobs:
-  update-lughelper:
+  update-vk-hdr-layer:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
