@@ -2,7 +2,7 @@ Copr repository for COPR repo for https://github.com/Zamundaaa/VK_hdr_layer, com
 
 The packages in this repo should work on Fedora 40+.
 
-
+See the COPR page here: https://copr.fedorainfracloud.org/coprs/jackgreiner/vk-hdr-layer
 
 ## Installation 
 
