@@ -26,7 +26,7 @@ jobs:
         id: get-current-commit
         run: |
           current_commit=$(grep -oP '(?<=^%global commit ).*' vk-hdr-layer.spec || echo "")
-          echo "current_commit=$current_commit" >> $GITHUB_OUTPUT
+          current_commit=$(echo "$current_commit" | tr -d '[:space:]') echo "current_commit=$current_commit" >> $GITHUB_OUTPUT
 
       - name: Get full commit SHA
         id: get-long-commit
