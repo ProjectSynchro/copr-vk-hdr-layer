@@ -11,32 +11,45 @@ Summary:        Implements HDR vulkan extensions in Wayland compositors that sup
 # SPDX
 License:        GPL-3.0-only
 URL:            https://github.com/Zamundaaa/VK_hdr_layer
-Source0:        https://github.com/Zamundaaa/VK_hdr_layer/archive/%{longcommit}.tar.gz
 
+BuildRequires:       gcc-c++
+BuildRequires:       meson
+BuildRequires:       git
 BuildRequires:       pkgconfig(x11)
 BuildRequires:       pkgconfig(vulkan)
+BuildRequires:       pkgconfig(vkroots)
 BuildRequires:       pkgconfig(wayland-client)
 BuildRequires:       pkgconfig(wayland-scanner)
+
+Recommends:          mesa-dri-drivers
+Recommends:          mesa-vulkan-drivers
 
 %description
 The %{name} package contains the VK_hdr_layer Vulkan layer which implements HDR vulkan extensions in Wayland compositors that support it.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+git clone --single-branch --branch main https://github.com/Zamundaaa/VK_hdr_layer
+cd VK_hdr_layer
+git checkout %{longcommit}
+git submodule update --init --recursive
 
 %build
+cd VK_hdr_layer
 
-%meson
+MESON_OPTIONS=(
+   --wrap-mode=nofallback
+)
+
+%meson "${MESON_OPTIONS[@]}"
 %meson_build
 
 %install
+cd VK_hdr_layer
 %meson_install
 
 %files
-%{_bindir}/%{name}
-%{_datadir}/icons/hicolor/256x256/apps/*.png
-%{_datadir}/%{name}/*
-%{_datadir}/applications/%{name}.desktop
+%{_libdir}/libVkLayer_hdr_wsi.so
+%{_datadir}/vulkan/implicit_layer.d/VkLayer_hdr_wsi.x86_64.json
 
 %changelog
 %autochangelog
