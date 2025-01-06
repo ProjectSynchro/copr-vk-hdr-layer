@@ -49,7 +49,7 @@ cd VK_hdr_layer
 
 %files
 %{_libdir}/libVkLayer_hdr_wsi.so
-%{_datadir}/vulkan/implicit_layer.d/VkLayer_hdr_wsi.x86_64.json
+%{_datadir}/vulkan/implicit_layer.d/VkLayer_hdr_wsi.*.json
 
 %changelog
 %autochangelog
