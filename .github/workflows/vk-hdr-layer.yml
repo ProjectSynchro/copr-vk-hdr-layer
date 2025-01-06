@@ -1,0 +1,59 @@
+name: Update vk-hdr-layer
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  update-lughelper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get short commit SHA
+        id: get-commit-sha
+        run: |
+          echo "short_commit=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Get current date
+        id: get-current-date
+        run: |
+          echo "current_date=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Get current commit in spec
+        id: get-current-commit
+        run: |
+          current_commit=$(grep -oP '(?<=^%global commit ).*' vk-hdr-layer.spec || echo "")
+          echo "current_commit=$current_commit" >> $GITHUB_OUTPUT
+
+      - name: Get full commit SHA
+        id: get-long-commit
+        run: |
+          echo "long_commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Compare commits
+        id: compare-commits
+        run: |
+          if [ "${{ steps.get-commit-sha.outputs.short_commit }}" != "${{ steps.get-current-commit.outputs.current_commit }}" ]; then
+            echo "new-commit='true'" >> $GITHUB_OUTPUT
+          else
+            echo "new-commit='false'" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Spec File
+        if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
+        run: |
+          sed -i "s/^%global date .*/%global date ${{ steps.get-current-date.outputs.current_date }}/" vk-hdr-layer.spec
+          sed -i "s/^%global commit .*/%global commit ${{ steps.get-commit-sha.outputs.short_commit }}/" vk-hdr-layer.spec
+          sed -i "s/^%global longcommit .*/%global longcommit ${{ steps.get-long-commit.outputs.long_commit }}/" vk-hdr-layer.spec
+          
+      - name: Commit and Push Changes
+        if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add vk-hdr-layer.spec
+          git commit -m "vk-hdr-layer.spec: Update commit, longcommit, and date macros"
+          git push
