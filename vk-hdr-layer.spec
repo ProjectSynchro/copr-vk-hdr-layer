@@ -1,7 +1,7 @@
 %global tag 0
-%global date 20250106
-%global commit 1534ef8
-%global longcommit 1534ef826bfecf525a6c3154f2e3b52d640a79cf
+%global date 20250213
+%global commit 0981545
+%global longcommit 09815451e063b9fcccaac9d370b3a7020c7e0c32
 
 Name:           vk-hdr-layer
 Version:        %{tag}
