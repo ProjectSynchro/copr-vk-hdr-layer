@@ -70,14 +70,14 @@ jobs:
           fi
 
       - name: Update Spec File
-        if: ${{ contains(steps.compare-commits.outputs.new-commit, 'true') }}
+        if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
         run: |
           sed -i "s/^%global date .*/%global date ${{ steps.get-current-date.outputs.current_date }}/" vk-hdr-layer.spec
           sed -i "s/^%global commit .*/%global commit ${{ steps.get-latest-commit.outputs.short_commit }}/" vk-hdr-layer.spec
           sed -i "s/^%global longcommit .*/%global longcommit ${{ steps.get-latest-commit.outputs.latest_commit }}/" vk-hdr-layer.spec
           
       - name: Commit and Push Changes
-        if: ${{ contains(steps.compare-commits.outputs.new-commit, 'true') }}
+        if: ${{ steps.compare-commits.outputs.new-commit == 'true' }}
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
